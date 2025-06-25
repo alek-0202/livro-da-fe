@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Livro Pixelado</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: url('https://i.imgur.com/eoGpBFv.png') repeat; /* pixel art bg */
+      background-color: #1e1e1e;
+      color: #ffffff;
+      font-family: 'Press Start 2P', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .book {
+  background: linear-gradient(145deg, #5a4bff, #9a68ff); /* gradiente bonito */
+  border: 6px solid #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 600px;
+  min-height: 300px;
+  text-align: center;
+  position: relative;
+  box-shadow: 8px 8px 0 #000, 0 0 20px #4b0082; /* sombra pixel e mágica */
+}
+
+
+
+
+
+    .page {
+      min-height: 200px;
+      padding: 10px;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    .fade-out {
+      opacity: 0;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+   button {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  padding: 10px 20px;
+  background-color: #ff4f4f;
+  color: white;
+  border: 4px solid #fff;
+  box-shadow: 4px 4px 0 #000;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+button:hover {
+  background-color: #ff7979;
+}
+
+button:active {
+  box-shadow: 2px 2px 0 #000;
+  transform: translate(2px, 2px);
+}
+
+  </style>
+</head>
+<body>
+  <div class="book">
+    <div class="page" id="page-content">
+      <!-- Conteúdo da primeira página será mostrado aqui -->
+    </div>
+    <div class="nav-buttons">
+  <button onclick="prevPage()">← Anterior</button>
+  <button onclick="goToStart()">
+        <img src="coracao.png" alt="Início" style="height: 20px; vertical-align: middle;" />
+    Inicio
+    <img src="coracao.png" alt="Início" style="height: 20px; vertical-align: middle;" />
+  </button>
+  <button onclick="nextPage()">Próxima →</button>
+</div>
+
+      
+  </div>
+
+  <script>
+    const pages = [
+      "🌟 Olá Fê!<br><br>Sim, eu te enganei, não era convite pra diablo xD!<br><br> Antes de continuar, preciso informar algumas coisas! ->",
+      "1: Independente do que eu dizer aqui, nada vai mudar, eu vou continuar sendo o mesmo e espero que você também! <br><br> 2: Não, isso não é uma cartinha de amor ou algo do tipo.<br><br> 3: Eu apenas queria falar algumas coisas...",
+      "🌟 Motivos 🌟<br><br> Eu sou o tipo de pessoa que guarda muita coisa pra si, e com o tempo isso vai me fazendo mal. <br><br> Dito isso, decidi fazer isso aqui pois não tinha ideia de como te falar certas coisas e o motivo delas.",
+      "✨ Bom, então vamos começar. <br><br> Como deve ter percebido, assim como todos a nossa volta, eu gosto de você, e tipo... bastante. Sei que eu provavelmente não deveria estar te dizendo isso, mas fazer o que... :p ✨",
+      "✨ Voce é o tipo de pessoa na qual eu não consigo evitar, mesmo eu não querendo sentir algo por alguém, mesmo tentando evitar ao máximo esse tipo de sentimento, eu não consegui evitar...✨",
+      "✨ E olha que eu sou alguém bem frio em relação aos sentimentos. Possuo um bom controle emocional e não me deixo apegar a qualquer pessoa, pois por experiencias passadas, aprendi que só devo me deixar sentir isso quando eu realmente vou ter algo ou desenvolver alguma coisa com a pessoa... ✨",
+      "✨ Mas com você isso não foi tão simples, você é exatamente o tipo de pessoa que me atrai em todos os aspectos possiveis, o tipo de pessoa na qual mesmo eu querendo muito não sentir nada, eu acabo sentindo, simplesmente porque sim. Sabe la Deus o motivo, mas não consigo evitar...",
+      "✨ E quando eu digo sentir algo, não é estar apaixonado ou sla oq, mas sim apenas sentir uma atração inexplicável por você. <br><br> Eu amo sua companhia e gosto muito de passar meu tempo contigo! E os motivos? Bom...✨",
+      "✨ Primeiramente você á uma pessoa extremamente inteligente, esperta, é engraçada e tem o humor tão quebrado quanto o meu. <br><br> Temos os mesmos gostos e compartilhamos de algumas ideias muito parecidas. <br><br> E é claro, não posso deixar de comentar que eu amo fazer voce rir, eu amo sua risada, e é simplesmente a melhor coisa de ouvir quando eu faço alguma piada idiota...✨",
+      "✨ E não menos importante, tu é linda para um caralho, tipo, muito mesmo. Vai tomar no seu cu, disgraçaaaaaaaaaaa aaaaaaaaaaaaaaa chidori✨",
+      "✨ Bom, obviamente eu poderia ter dito isso de uma forma melhor, mas foi o que eu consegui pensar :p <br><br> Por fim, gostaria de dizer que assim como disse no começo, não quero que isso mude nada na nossa amizade, até porque eu te considero muito e gosto de ter voce por perto. <br><br> Eu apenas queria colocar esses pensamentos para fora e queria que voce soubesse, mas não se preocupe, eu não estou mal ou algo do tipo, é apenas um sentimento abstrato...✨",
+      "✨ Escrevendo isso eu percebi que eu gostaria de explicar muito mais, pois querendo ou não é um pouco estranho tudo isso... Mas enfim, espero que não seja tão estranho assim kkk",
+      "Obrigado pela atenção ^^.<br><br><br><br><br>Com carinho, Ale 🎁"
+    ];
+
+    let currentPage = 0;
+    const content = document.getElementById("page-content");
+
+    function renderPage() {
+      content.classList.add("fade-out");
+
+      setTimeout(() => {
+        content.innerHTML = pages[currentPage].replace(/\n/g, "<br>");
+        content.classList.remove("fade-out");
+      }, 250);
+    }
+
+    function nextPage() {
+      if (currentPage < pages.length - 1) {
+        currentPage++;
+        renderPage();
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 0) {
+        currentPage--;
+        renderPage();
+      }
+    }
+
+    function goToStart() {
+  currentPage = 0;
+  renderPage();
+}
+
+
+    // Mostrar primeira página
+    renderPage();
+  </script>
+</body>
+</html>
