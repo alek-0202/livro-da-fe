@@ -15,7 +15,7 @@
     }
 
     body {
-      
+      overflow: visible;
       background-color: #1e1e1e;
       color: #ffffff;
       font-family: 'Press Start 2P', cursive;
@@ -48,30 +48,66 @@
   align-items: center;
   gap: 10px;
   background: #000000cc;
-  padding: 8px 12px;
+  padding: 10px;
   border: 3px solid white;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 0 8px #9a68ff;
   font-size: 8px;
+  flex-direction: column;
+  width: 120px;
+}
+
+.meteoro {
+  position: fixed;
+  top: -50px;
+  width: 10px;
+  height: 30px;
+  background: linear-gradient(white, transparent);
+  animation: queda-meteoro 4s linear forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+@keyframes queda-meteoro {
+  to {
+    transform: translateY(110vh);
+    opacity: 0;
+  }
 }
 
 .cd-icon {
-  width: 24px;
-  height: 24px;
-  background: radial-gradient(#fff 20%, #888 60%, #333 100%);
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at center, #fff 20%, #ff69b4 50%, #8a2be2 100%);
   border-radius: 50%;
   border: 2px solid #fff;
   animation: girar-cd 3s linear infinite;
+  box-shadow: 0 0 5px #fff;
 }
 
 .music-info {
   color: #fff;
   font-family: 'Press Start 2P', cursive;
-  font-size: 7px;
-  max-width: 100px;
+  font-size: 6px;
+  text-align: center;
+  width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.music-progress {
+  width: 100%;
+  height: 6px;
+  background: #444;
+  border: 1px solid #fff;
+  margin-top: 6px;
+  position: relative;
+}
+
+.music-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #ff69b4, #8a2be2);
+  width: 0%;
 }
 
 @keyframes girar-cd {
@@ -146,9 +182,29 @@
       font-size: 10px;
       line-height: 1.6;
     }
+    .box-2{
+      display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+  background: linear-gradient(145deg, #2d1e4f, #3a2d68);
+  border: 4px solid #ffffff;
+  border-radius: 8px;
+
+  box-shadow:
+    inset 0 0 4px #ffffff55,
+    0 0 0 2px #6f00ff,
+    0 0 10px #9a68ff,
+    4px 4px 0 #000;
+    
+  animation: pixel-shine 2s infinite;
+  padding: 8px;
+    }
+
     .box-avatar {
-  width: 180px;
-  height: 200px;
+  width: 220px;
+  height: 240px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -183,7 +239,12 @@
   height: auto;
   animation: flutuar 3s ease-in-out infinite;
 }
-
+#btn-cor-book {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+}
 .pixel-yuumi {
   font-size: 48px;
   animation: flutuar 2.5s ease-in-out infinite;
@@ -198,16 +259,40 @@
   50%  { transform: translateY(-8px); }
   100% { transform: translateY(0px); }
 }
+.box-titulo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  color: white;
+  padding: 0 8px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 8px;
+  z-index: 2;
+  white-space: nowrap;
+  text-align: center;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
+  pointer-events: none;
+}
+.custom-box {
+  position: relative;
+  padding-top: 32px; /* espaço pro título flutuante */
+}
   </style>
 </head>
 <body>
   <canvas id="star-canvas"></canvas>
 
   <div class="book">
-  <div class="music-player" onclick="alternarMusica()">
+ <div class="music-player" onclick="alternarMusica()">
   <div class="cd-icon"></div>
-  <div class="music-info" id="nome-musica">The Perfect Girl.mp3</div>
+  <div class="music-info" id="nome-musica">music.mp3</div>
+  <div class="music-progress">
+    <div class="music-progress-fill" id="barra-musica"></div>
+  </div>
 </div>
+
 
 
 <audio id="musica" src="musicas/ThePerfectGirl.mp3" loop></audio>
@@ -240,14 +325,18 @@
     </div>
 
     <div class="nav-buttons">
-      
-
+    
       <a class="nes-btn" href="#" onclick="prevPage()">Anterior</a>
       <a class="nes-btn is-warning" href="#" onclick="trocarModo()">
   🔄
 </a>
       <a class="nes-btn" href="#" onclick="nextPage()">Próxima</a>
     </div>
+    <button class="nes-btn is-success" onclick="document.getElementById('picker').click()" id="btn-cor-book">
+  🎨 Cor do Livro
+</button>
+<input type="color" id="picker" style="display: none;" onchange="alterarCorBook(this.value)">
+
   </div>
 
   <script>
@@ -265,10 +354,10 @@
   const audio = document.getElementById("musica");
 const btnMusica = document.getElementById("btn-musica");
 
-function alternarMusica() {
-  const audio = document.getElementById("musica");
-  const nomeMusica = document.getElementById("nome-musica");
+const nomeMusica = document.getElementById("nome-musica");
+const barraMusica = document.getElementById("barra-musica");
 
+function alternarMusica() {
   if (audio.paused) {
     audio.play();
     nomeMusica.textContent = audio.src.split("/").pop();
@@ -277,6 +366,13 @@ function alternarMusica() {
     nomeMusica.textContent = "Silenciado";
   }
 }
+
+// Atualiza a barra de progresso enquanto a música toca
+audio.addEventListener("timeupdate", () => {
+  const progresso = (audio.currentTime / audio.duration) * 100;
+  barraMusica.style.width = `${progresso}%`;
+});
+
 
 
    document.body.addEventListener('click', () => {
@@ -292,19 +388,25 @@ function alternarMusica() {
   <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
     <!-- Box do Avatar -->
     <div class="nes-container is-dark with-title box-avatar anim-glow">
+       <div class="box">
+                <div class="box-titulo"></div>
       <p class="title">👩‍💻 Avatar</p>
+      </div>
       <img src="fe_pixel.png" alt="Avatar da Fernanda" class="pixel-avatar" />
     </div>
 
     <!-- Yuumi -->
     <div class="nes-container is-dark with-title box-avatar anim-glow">
+       <div class="box">
+                <div class="box-titulo"></div>
       <p class="title">🐱 Yuumi</p>
+      </div>
       <i class="nes-octocat animate pixel-yuumi"></i>
     </div>
   </div>
   `,
       `
-        <div class="nes-container is-dark with-title">
+        <div class="nes-container is-dark with-title box-2">
           <p class="title">🎁 Curiosidades</p>
           <ul>
             <li>🐱 Ama gatos</li>
@@ -315,10 +417,24 @@ function alternarMusica() {
           </ul>
         </div>
       `
+      ,
+      `
+       <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+         <!-- Pokemon favorito -->
+           <div class="nes-container is-dark with-title box-avatar custom-box anim-glow">
+            <div class="box">
+                <div class="box-titulo"></div>
+                <p class="title title-box">💜 Pokemon Favorito</p>
+                </div>
+             <img src="dragonite.png" alt="Dragonite" class="pixel-avatar"/>
+    </div> 
+    `
+
     ];
 
     let currentPage = 0;
     const content = document.getElementById("page-content");
+    let modoAtivo = 1; // 1 = Ficha + páginas, 2 = Outro conteúdo
 
     function renderPage() {
       if (modoAtivo !== 1) return;
@@ -348,7 +464,7 @@ function alternarMusica() {
       renderPage();
     }
 
-    let modoAtivo = 1; // 1 = Ficha + páginas, 2 = Outro conteúdo
+  
 
 function trocarModo() {
   modoAtivo = modoAtivo === 1 ? 2 : 1;
@@ -367,13 +483,15 @@ function atualizarVisual() {
   } else {
     ficha.style.display = "none";
     botoes.style.display = "flex";
-    content.innerHTML = `
-      <div class="nes-container is-dark with-title">
-        <p class="title">🌟 Homenagem</p>
-        <p>Fernanda, você é uma pessoa incrível e pipipipopopo 💖</p>
-        <p>— Assinado com muito carinho 💌</p>
-      </div>
-    `;
+   content.innerHTML = `
+  <div class="nes-container is-dark with-title" style="display: flex; flex-direction: column; align-items: center;">
+    <p class="title">🐱 Acaricie o Gato!</p>
+    <img src="catcat.png" alt="Gato Pixel" style="width: 100px; image-rendering: pixelated; cursor: pointer;" onclick="fazerCarinho()" />
+    <p id="contador-carinho" style="margin-top: 12px;">💖 Carinhos: 0</p>
+    <p id="mensagem-carinho" style="font-size: 10px;"></p>
+  </div>
+`;
+
   }
 }
 
@@ -381,14 +499,96 @@ function atualizarVisual() {
   </script>
 
   <script>
+    function alterarCorBook(cor) {
+  const book = document.querySelector('.book');
+  book.style.background = cor;
+  book.style.boxShadow = `8px 8px 0 #000, 0 0 20px ${cor}`;
+}
+
+let totalCarinhos = 0;
+
+function fazerCarinho() {
+  totalCarinhos++;
+  document.getElementById("contador-carinho").textContent = `💖 Carinhos: ${totalCarinhos}`;
+
+  const mensagem = document.getElementById("mensagem-carinho");
+  if (totalCarinhos === 10) mensagem.textContent = "🐾 Ele começou a ronronar!";
+  else if (totalCarinhos === 25) mensagem.textContent = "😻 Ele ama você!";
+  else if (totalCarinhos === 50) mensagem.textContent = "✨ Gato ultra feliz!";
+  else if (totalCarinhos === 100) mensagem.textContent = "🏆 Você desbloqueou o final secreto!";
+}
+
+
   const canvas = document.getElementById('star-canvas');
   const ctx = canvas.getContext('2d');
   let stars = [];
+  let meteoros = [];
 
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
+
+
+function criarMeteoro() {
+    return {
+      x: Math.random() * canvas.width,
+      y: -20,
+      length: 100 + Math.random() * 50,
+      speed: 8 + Math.random() * 5,
+      opacity: Math.random() * 0.5 + 0.5,
+      color: `rgba(255, ${Math.floor(Math.random() * 100)}, 0, ${Math.random() * 0.8 + 0.2})`
+    };
+  }
+
+  function desenharMeteoro(m) {
+    ctx.beginPath();
+    ctx.strokeStyle = m.color;
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = m.opacity;
+    ctx.moveTo(m.x, m.y);
+    ctx.lineTo(m.x + m.length * 0.5, m.y + m.length);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+function animarCanvas() {
+    // Limpa o canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Desenha estrelas (sempre)
+    ctx.fillStyle = '#ffffff';
+    stars.forEach(star => {
+      ctx.fillRect(star.x, star.y, star.size, star.size);
+      star.y += star.speed;
+      if (star.y > canvas.height) {
+        star.y = 0;
+        star.x = Math.random() * canvas.width;
+      }
+    });
+
+    // Desenha meteoros (condicional)
+    if (modoAtivo === 2 && totalCarinhos >= 100) {
+      if (meteoros.length < 10 && Math.random() < 0.3) {
+        meteoros.push(criarMeteoro());
+      }
+
+      meteoros.forEach((m, i) => {
+        m.x += m.speed * 0.5;
+        m.y += m.speed;
+        desenharMeteoro(m);
+
+        if (m.y > canvas.height || m.x > canvas.width) {
+          meteoros.splice(i, 1);
+        }
+      });
+    }
+
+    requestAnimationFrame(animarCanvas);
+  }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+ // inicia a animação de fundo
 
   function createStars(count) {
     stars = [];
@@ -427,7 +627,13 @@ function atualizarVisual() {
 
   resizeCanvas();
   createStars(100);
-  animate();
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    createStars(100);
+  });
+
+  animarCanvas();
+  
 </script>
 </body>
 </html>
