@@ -39,6 +39,46 @@
       padding: 20px;
     }
 
+    .music-player {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #000000cc;
+  padding: 8px 12px;
+  border: 3px solid white;
+  border-radius: 8px;
+  box-shadow: 0 0 8px #9a68ff;
+  font-size: 8px;
+}
+
+.cd-icon {
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(#fff 20%, #888 60%, #333 100%);
+  border-radius: 50%;
+  border: 2px solid #fff;
+  animation: girar-cd 3s linear infinite;
+}
+
+.music-info {
+  color: #fff;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 7px;
+  max-width: 100px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@keyframes girar-cd {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
     .book {
       background: linear-gradient(145deg, #a1902f, #b14f31);
       border: 6px solid #ffffff;
@@ -164,12 +204,13 @@
   <canvas id="star-canvas"></canvas>
 
   <div class="book">
-   <button id="btn-musica" class="nes-btn is-primary" onclick="alternarMusica()"
-  style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
-  🔊 Música
-</button>
+  <div class="music-player" onclick="alternarMusica()">
+  <div class="cd-icon"></div>
+  <div class="music-info" id="nome-musica">The Perfect Girl.mp3</div>
+</div>
 
-<audio id="musica" src="musicas/music.mp3" loop></audio>
+
+<audio id="musica" src="musicas/ThePerfectGirl.mp3" loop></audio>
     <div class="page-content-wrapper">
 <div class="nes-container is-dark with-title ficha-container">
         <p class="title"><i class="snes-logo"></i> Ficha da Fê</p>
@@ -225,14 +266,19 @@
 const btnMusica = document.getElementById("btn-musica");
 
 function alternarMusica() {
+  const audio = document.getElementById("musica");
+  const nomeMusica = document.getElementById("nome-musica");
+
   if (audio.paused) {
     audio.play();
-    btnMusica.innerHTML = "🔊 Tocando";
+    nomeMusica.textContent = audio.src.split("/").pop();
   } else {
     audio.pause();
-    btnMusica.innerHTML = "🔈 Silenciado";
+    nomeMusica.textContent = "Silenciado";
   }
 }
+
+
    document.body.addEventListener('click', () => {
     if (!isPlaying) {
       music.play().catch(() => {});
