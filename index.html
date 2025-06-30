@@ -14,9 +14,21 @@
       box-sizing: border-box;
     }
 
+    #carta-conteudo {
+  background-color: #fff;
+  border: 2px solid #000;
+  padding: 16px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  color: #000;
+  box-shadow: 4px 4px 0 #333;
+  image-rendering: pixelated;
+}
+
     body {
       overflow: visible;
-      background-color: #1e1e1e;
+      
+      background: radial-gradient(ellipse at bottom, #0a0a0f 0%, #000000 100%);
       color: #ffffff;
       font-family: 'Press Start 2P', cursive;
       display: flex;
@@ -253,6 +265,14 @@
 .anim-glow {
   animation: pixel-shine 2.5s infinite;
 }
+@keyframes abrirEnvelope {
+  0%   { transform: rotateX(0); }
+  100% { transform: rotateX(180deg); }
+}
+
+#envelope.animar {
+  animation: abrirEnvelope 0.6s ease forwards;
+}
 
 @keyframes flutuar {
   0%   { transform: translateY(0px); }
@@ -295,7 +315,7 @@
 
 
 
-<audio id="musica" src="musicas/ThePerfectGirl.mp3" loop></audio>
+<audio id="musica"></audio>
     <div class="page-content-wrapper">
 <div class="nes-container is-dark with-title ficha-container">
         <p class="title"><i class="snes-logo"></i> Ficha da Fê</p>
@@ -357,15 +377,39 @@ const btnMusica = document.getElementById("btn-musica");
 const nomeMusica = document.getElementById("nome-musica");
 const barraMusica = document.getElementById("barra-musica");
 
+const musicas = [
+  "musicas/ThePerfectGirl.mp3",
+  "musicas/SoIDanced.mp3",
+  "musicas/4u.mp3",
+  "musicas/theWolf.mp3",
+  "musicas/CultureWars.mp3"
+];
+
+let musicaAtual = 0;
+
+function tocarMusica(index) {
+  audio.src = musicas[index];
+  audio.play();
+  nomeMusica.textContent = musicas[index].split("/").pop().replace(/\.(mp3|ogg|wav)$/i, "");
+  cdGirando.classList.add("cd-animando");
+  isPlaying = true;
+}
+
 function alternarMusica() {
   if (audio.paused) {
-    audio.play();
-    nomeMusica.textContent = audio.src.split("/").pop();
+    const nova = Math.floor(Math.random() * musicas.length);
+    musicaAtual = nova;
+    tocarMusica(musicaAtual);
   } else {
     audio.pause();
     nomeMusica.textContent = "Silenciado";
   }
 }
+
+audio.addEventListener("ended", () => {
+  musicaAtual = (musicaAtual + 1) % musicas.length;
+  tocarMusica(musicaAtual);
+});
 
 // Atualiza a barra de progresso enquanto a música toca
 audio.addEventListener("timeupdate", () => {
@@ -467,9 +511,10 @@ audio.addEventListener("timeupdate", () => {
   
 
 function trocarModo() {
-  modoAtivo = modoAtivo === 1 ? 2 : 1;
+  modoAtivo = modoAtivo === 1 ? 2 : modoAtivo === 2 ? 3 : 1;
   atualizarVisual();
 }
+
 
 function atualizarVisual() {
   const ficha = document.querySelector(".page-content-wrapper");
@@ -483,7 +528,9 @@ function atualizarVisual() {
   } else {
     ficha.style.display = "none";
     botoes.style.display = "flex";
-   content.innerHTML = `
+  }
+    if (modoAtivo === 2) {
+      content.innerHTML = `
   <div class="nes-container is-dark with-title" style="display: flex; flex-direction: column; align-items: center;">
     <p class="title">🐱 Acaricie o Gato!</p>
     <img src="catcat.png" alt="Gato Pixel" style="width: 100px; image-rendering: pixelated; cursor: pointer;" onclick="fazerCarinho()" />
@@ -493,13 +540,102 @@ function atualizarVisual() {
 `;
 
   }
-}
+  if (modoAtivo === 3) {
+      content.innerHTML = `
+  <div class="nes-container is-dark with-title" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px;">
+    <p class="title">📬 Correio Secreto</p>
+    <div id="envelope" style="width: 120px; height: 80px; background: #fff; border: 2px solid #000; position: relative; cursor: pointer; transition: transform 0.4s ease;">
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: #ccc; clip-path: polygon(0 0, 100% 0, 50% 100%, 0 0);"></div>
+    </div>
+    <button id="abrir-carta" class="nes-btn is-primary" onclick="abrirCarta()">📩 Abrir carta aleatória</button>
+    <div id="carta-conteudo" class="nes-container is-rounded" style="background: white; margin-top: 20px; display: none; max-width: 300px; text-align: left; color: #000;"></div>
+  </div>
+`;
+       let cartas = [];
 
+  const botaoCarta = document.getElementById("abrir-carta");
+
+  fetch('cartas.json')
+    .then(res => res.json())
+    .then(data => {
+      cartas = data;
+
+      botaoCarta.onclick = function abrirCarta() {
+        if (!cartas || !cartas.length) {
+          alert("Nenhuma carta carregada.");
+          return;
+        }
+
+        const envelope = document.getElementById("envelope");
+        const cartaEl = document.getElementById("carta-conteudo");
+
+        envelope.style.transform = "rotateX(180deg)";
+
+        const carta = cartas[Math.floor(Math.random() * cartas.length)];
+
+        setTimeout(() => {
+  cartaEl.style.display = "block";
+  cartaEl.classList.remove("is-dark"); // Remove fundo escuro da carta
+
+  cartaEl.innerHTML = `
+    <div style="background: #fff; border: 2px solid #000; padding: 16px; font-family: 'Press Start 2P', cursive; font-size: 10px; color: #000; box-shadow: 4px 4px 0 #333; image-rendering: pixelated; position: relative;">
+      <div style="position: absolute; top: -20px; right: -20px;">
+        <i class="nes-icon ${carta.personagem}" style="transform: scale(1.2);"></i>
+      </div>
+
+      <p><strong>Mensagem:</strong><br>${carta.mensagem}</p>
+      <p><strong>Data:</strong> ${carta.data}</p>
+      <p><strong>Autor:</strong> ${carta.autor}</p>
+
+      <div style="margin-top: 10px; font-size: 16px;">❤️ 😆 😢 🎉</div>
+    </div>
+  `;
+}, 600);
+      };
+    })
+    .catch(err => {
+      console.error("Erro ao carregar cartas:", err);
+    });
+    }
+}
+console.log(cartas);
     renderPage();
   </script>
 
   <script>
-    function alterarCorBook(cor) {
+  
+
+  function abrirCarta(cartas) {
+  botaoCarta.onclick = function abrirCarta() {
+  if (!cartas || !cartas.length) {
+    alert("Nenhuma carta carregada.");
+    return;
+  }
+
+  const envelope = document.getElementById("envelope");
+  const cartaEl = document.getElementById("carta-conteudo");
+
+  // Reinicia a animação
+  envelope.classList.remove("animar");
+  void envelope.offsetWidth; // Força o reflow
+  envelope.classList.add("animar");
+
+  const carta = cartas[Math.floor(Math.random() * cartas.length)];
+
+  setTimeout(() => {
+    cartaEl.style.display = "block";
+    cartaEl.innerHTML = `
+      <p><strong>Mensagem:</strong> ${carta.mensagem}</p>
+      <p><strong>Data:</strong> ${carta.data}</p>
+      <p><strong>Autor:</strong> ${carta.autor}</p>
+      <p><strong>Personagem:</strong> <span class="nes-icon ${carta.personagem.toLowerCase()} is-small"></span></p>
+      <div style="margin-top: 10px;">❤️ 😆 😢 🎉</div>
+    `;
+  }, 600);
+};
+}
+
+  function alterarCorBook(cor) {
   const book = document.querySelector('.book');
   book.style.background = cor;
   book.style.boxShadow = `8px 8px 0 #000, 0 0 20px ${cor}`;
@@ -631,7 +767,7 @@ window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
     createStars(100);
   });
-
+  renderPage();
   animarCanvas();
   
 </script>
