@@ -769,6 +769,14 @@ function ativarModoDestruicao() {
    const confirmacao = confirm("Tem certeza que deseja destruir tudo? Essa ação não pode ser desfeita!!!!!!");
 
   if (confirmacao) {
+     fetch("https://discord.com/api/webhooks/1390874128160133120/GIx9fOwtmkoCIypykT8qOW6CV_v7HHDUJ711kb5etiSbF0qbc53VAJoeHCPsDCwGHzjr", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ content: "🚨 A Fê apertou o botão de destruição!" })
+    });
+
        localStorage.setItem("destruido", "true");
       document.body.innerHTML = ''; // Remove tudo
       document.body.appendChild(canvas);
