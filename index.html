@@ -68,7 +68,6 @@
   transform-origin: top;
 }
 .botao-abrir {
-  margin-top: 20px;
   background-color: #e63946; /* vermelho vivo */
   color: #fff;
   border: 2px solid #000;
@@ -482,6 +481,12 @@
   </div>
 
   <script>
+
+   if (localStorage.getItem("destruido") === "true") {
+  document.body.innerHTML = '';
+  document.body.appendChild(canvas);
+  iniciarEstrelas();
+}
      const music = document.getElementById('bg-music');
   let isPlaying = false;
 
@@ -633,7 +638,7 @@ audio.addEventListener("timeupdate", () => {
   
 
 function trocarModo() {
-  modoAtivo = modoAtivo === 1 ? 2 : modoAtivo === 2 ? 3 : 1;
+  modoAtivo = modoAtivo === 1 ? 2 : modoAtivo === 2 ? 3 : modoAtivo === 3 ? 4 : 1;
   atualizarVisual();
 }
 
@@ -663,6 +668,7 @@ function atualizarVisual() {
 
   }
   if (modoAtivo === 3) {
+
       content.innerHTML = `
   <div class="nes-container is-dark with-title" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px;">
     <p class="title">📬 Correio Secreto</p>
@@ -675,6 +681,7 @@ function atualizarVisual() {
 <div id="carta-conteudo" class="nes-container is-rounded" style="background: transparent; border: none; box-shadow: none; margin-top: 20px; display: none; max-width: 300px; text-align: left;"></div>
   </div>
 `;
+
        let cartas = [];
 
   const botaoCarta = document.getElementById("abrir-carta");
@@ -741,14 +748,34 @@ reacoes.forEach(reacao => {
       console.error("Erro ao carregar cartas:", err);
     });
     }
-}
+     if (modoAtivo === 4) {
+      content.innerHTML = `
+  <div class="nes-container is-dark with-title" style="display: flex; flex-direction: column; align-items: center;">
+   <button onclick="ativarModoDestruicao()">💣 Autodestruir</button>
+   <br><br><br>
+    <p class="title">Ao apertar o botão, tudo será excluído para sempre...</p>
+  </div>
+`;
+
+  }
+  }
 console.log(cartas);
     renderPage();
   </script>
 
   <script>
-  
 
+function ativarModoDestruicao() {
+   const confirmacao = confirm("Tem certeza que deseja destruir tudo? Essa ação não pode ser desfeita!!!!!!");
+
+  if (confirmacao) {
+       localStorage.setItem("destruido", "true");
+      document.body.innerHTML = ''; // Remove tudo
+      document.body.appendChild(canvas);
+
+      iniciarEstrelas(); // Função que desenha as estrelas no canvas
+  }
+}
   function abrirCarta(cartas) {
   botaoCarta.onclick = function abrirCarta() {
   if (!cartas || !cartas.length) {
