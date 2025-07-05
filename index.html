@@ -481,7 +481,15 @@
   </div>
 
   <script>
-
+  window.onload = () => {
+  fetch("https://discord.com/api/webhooks/1390883141572628591/UIzbJbduN9_j6gXO0Oz5U0GkxBIJA7y2NE60b47mAKTEEpgPQ8YM_zmo7vR4ZWErlyJT", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ content: "🚨 A Fê acessou o site!" })
+    });
+};
    if (localStorage.getItem("destruido") === "true") {
   document.body.innerHTML = '';
   document.body.appendChild(canvas);
